@@ -18,8 +18,7 @@ def zip_extract(zip_path, extract_path, name):
 
     # 先解压到临时文件夹
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        if not os.path.exists(TEMP_PATH):
-            zip_ref.extractall(TEMP_PATH)
+        zip_ref.extractall(TEMP_PATH)
 
     # 获取原始文件(名)路径
     origin_path = os.path.join(glob.glob(os.path.join(TEMP_PATH, '*/'))[0])
@@ -55,16 +54,20 @@ print("""
 输入menu查看菜单, 输入exit退出程序
 ==============================""")
 
-while True:
-    user = input("=> ")
-    if user == "menu":
-        menu = {
+def menu():
+    menu = {
             'menu': "查看菜单",
             'exit': "退出脚本",
             '1':"执行存档批量导入"
         }
-        for i,v in menu.items():
-            print(i, v)
+    for i,v in menu.items():
+        print(i, v)
+
+menu()
+while True:
+    user = input("=> ")
+    if user == "menu":
+        menu()
     elif user == 'exit':
         os.system("pause")
         break
