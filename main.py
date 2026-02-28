@@ -18,7 +18,8 @@ def zip_extract(zip_path, extract_path, name):
 
     # 先解压到临时文件夹
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(TEMP_PATH)
+        if not os.path.exists(TEMP_PATH):
+            zip_ref.extractall(TEMP_PATH)
 
     # 获取原始文件(名)路径
     origin_path = os.path.join(glob.glob(os.path.join(TEMP_PATH, '*/'))[0])
