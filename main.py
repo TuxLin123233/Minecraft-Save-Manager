@@ -21,7 +21,10 @@ def zip_extract(zip_path, extract_path, name):
         zip_ref.extractall(TEMP_PATH)
 
     # 获取原始文件(名)路径
-    origin_path = os.path.join(glob.glob(os.path.join(TEMP_PATH, '*/'))[0])
+    origin_path = os.path.join(glob.glob(os.path.join(TEMP_PATH, '*\\'))[0])
+    # 去掉某尾反斜杠
+    origin_path = origin_path.rstrip('\\/')
+    
     os.system(f'move "{origin_path}" "{os.path.join(extract_path, name)}"')
 
 class Box:
