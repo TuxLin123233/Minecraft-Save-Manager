@@ -22,10 +22,10 @@ jobs:
     
     - name: 打包成 exe
       run: |
-        pyinstaller -F --add-data "data.json;." --name="小林工具箱" main.py
+        pyinstaller -F --add-data "data.json;." --name="XiaoLinToolbox" main.py
     
     - name: 上传 exe 文件
       uses: actions/upload-artifact@v4
       with:
-        name: 小林工具箱-Windows版
+        name: XiaoLinToolbox-Windows  # 改为英文名
         path: dist/*.exe
