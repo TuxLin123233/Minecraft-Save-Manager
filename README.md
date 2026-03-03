@@ -1,6 +1,6 @@
-# Minecraft存档导入器
+# Minecraft存档管理器
 
-一个简单易用的 Minecraft 存档批量导入工具。
+一个简单易用的 Minecraft 存档管理工具。
 
 ---
 
