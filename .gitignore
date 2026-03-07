@@ -13,7 +13,6 @@ __pycache__/
 # 打包文件
 dist/
 build/
-*.spec
 
 # IDE
 .vscode/

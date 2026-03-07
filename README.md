@@ -45,9 +45,13 @@
 # 安装依赖
 pip install -r requirements.txt
 
-# 打包
+# 打包（推荐方式，使用 .spec 文件）
 cd code
-pyinstaller -F --icon="../icon.ico" --name="存档管理器" main.py
+pyinstaller save_manager.spec
+
+# 或者使用命令行方式
+cd code
+pyinstaller -F --noconsole --icon="../icon.ico" --name="存档管理器" --add-data="img;img" main.py
 ```
 
 ## 📄 许可证
