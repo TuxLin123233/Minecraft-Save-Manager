@@ -19,18 +19,16 @@ jobs:
       
       - name: 安装依赖
         run: |
+          pip install -r code/requirements.txt
           pip install pyinstaller
-          pip install customtkinter
-          pip install pillow
       
       - name: 打包成 exe
         run: |
           cd code
-          pyinstaller -F --icon="../icon.ico" --name="存档管理器" --add-data "../data.json;." main.py
-          #  --add-data "../data.json;."  这行把 data.json 打包进去
+          pyinstaller -F --icon="../icon.ico" --name="存档管理器" main.py
       
       - name: 上传 exe 文件
         uses: actions/upload-artifact@v4
         with:
-          name: 存档管理器-Windows
+          name: SaveManager-Windows  # ← 改成英文名
           path: code/dist/*.exe
