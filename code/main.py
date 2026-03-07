@@ -1,6 +1,6 @@
 from config import *
-from models import Cli
+from gui import App
 
-
-cli = Cli()
-cli.prompt()
+if __name__ == "__main__":
+    app = App()
+    app.window.mainloop()

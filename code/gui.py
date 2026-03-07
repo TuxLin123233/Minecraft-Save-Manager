@@ -133,6 +133,3 @@ class App:
         import_window = ctk.CTkToplevel(self.window)
         import_window.title("导入存档")
         import_window.geometry("500x400")
-
-app = App()
-app.window.mainloop()
