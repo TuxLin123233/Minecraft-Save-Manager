@@ -2,6 +2,8 @@ import os
 import zipfile
 import shutil
 import glob
-import pillow
+from PIL import Image
+import customtkinter as ctk
+
 
 TEMP_PATH = os.path.join('.', 'temp')   # ./temp文件夹路径

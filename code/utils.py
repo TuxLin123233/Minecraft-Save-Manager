@@ -15,3 +15,12 @@ def zip_extract(zip_path, extract_path, name):
     origin_path = glob.glob(os.path.join(TEMP_PATH, '*'))[0]
     # 移动文件夹并重新命名
     shutil.move(origin_path, os.path.join(extract_path, name))
+
+def get_image(image_name:str, size:tuple) -> ctk.CTkImage:
+    """获取CtkImage(可缩放)"""
+    pil_image = Image.open(os.path.join('.', 'img', f"{image_name}.png"))
+    return ctk.CTkImage(
+        light_image=pil_image,  # 浅色模式图片
+        dark_image=pil_image,   # 深色模式图片
+        size=size
+    )
