@@ -24,10 +24,10 @@ jobs:
       - name: 打包成 exe
         run: |
           cd code
-          pyinstaller -F \
-            --icon="../icon.ico" \
-            --name="存档管理器" \
-            --add-data="img;img" \   # ✅ 图片打包进去
+          pyinstaller -F `
+            --icon="../icon.ico" `
+            --name="存档管理器" `
+            --add-data="img;img" `
             main.py
       
       - name: 上传 exe 文件
