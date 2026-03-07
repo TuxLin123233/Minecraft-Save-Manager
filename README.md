@@ -2,7 +2,7 @@
 
 一个简单好用的 Minecraft Java版 存档管理工具。
 
-![主界面截图](screenshot.png)
+![主界面截图](./img/screenshot.png)
 
 ## ✨ 功能特点
 

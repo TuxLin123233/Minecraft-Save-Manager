@@ -28,7 +28,6 @@ class App:
         )
         image_label.pack(side='left', padx=(0, 5))
 
-
         # 大标题
         title = ctk.CTkLabel(
             header_frame,
