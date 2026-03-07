@@ -7,7 +7,7 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
-        ('img', 'img'),  # 打包图片资源
+        ('../img', 'img'),  # 打包图片资源
         ('../icon.ico', '.'),  # 打包图标文件到根目录
     ],
     hiddenimports=[],

@@ -34,7 +34,7 @@ def get_image(image_name: str, size: tuple) -> ctk.CTkImage:
         ctk.CTkImage: 返回CTkImage
     """
 
-    pil_image = Image.open(os.path.join(os.path.dirname(__file__), "img", f"{image_name}.png"))
+    pil_image = Image.open(os.path.join(IMG_PATH, f"{image_name}.png"))
 
     return ctk.CTkImage(
         light_image=pil_image, dark_image=pil_image, size=size  # 浅色模式图片  # 深色模式图片

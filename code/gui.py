@@ -9,6 +9,7 @@ class App:
         self.window.title("🗃存档管理器")
         self.window.geometry("400x290")
         self.window.resizable(False, False)
+        # self.window.iconbitmap(os.path.join(PROJECT_ROOT, "icon.ico"))  # 设置窗口图标（Linux不支持.ico格式）
 
         ctk.set_appearance_mode("light")
 
@@ -122,9 +123,12 @@ class App:
 
     def import_save(self):
         # GUI: 导入存档
+        print("import_save 方法被调用")  # 调试日志
         data = read_data()
+        print(f"读取的数据: {data}")  # 调试日志
 
         minecraft_path = data.get("minecraft_path", "")
+        print(f"minecraft_path: {minecraft_path}")  # 调试日志
 
         # 检查并获取 minecraft 文件夹路径
         if not minecraft_path:  # 如果没有记录的路径
