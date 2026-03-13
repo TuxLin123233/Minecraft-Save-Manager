@@ -53,6 +53,10 @@ DATA_PATH = os.path.join(BASE_PATH, 'data.json')
 # 字体文件夹路径（仅用于开发环境）
 FONTS_PATH = os.path.join(BASE_PATH, 'fonts')
 
-# 字体文件
-FONT_REGULAR = get_font_path("HarmonyOS_Sans_SC_Regular.ttf")
-FONT_MEDIUM = get_font_path("HarmonyOS_Sans_SC_Medium.ttf")
+# 字体文件名
+FONT_REGULAR_NAME = "HarmonyOS_Sans_SC_Regular"
+FONT_MEDIUM_NAME = "HarmonyOS_Sans_SC_Medium"
+
+# 字体文件路径
+FONT_REGULAR_PATH = get_font_path(f"{FONT_REGULAR_NAME}.ttf")
+FONT_MEDIUM_PATH = get_font_path(f"{FONT_MEDIUM_NAME}.ttf")

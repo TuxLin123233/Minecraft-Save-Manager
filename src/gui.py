@@ -17,10 +17,14 @@ class App:
 
         ctk.set_appearance_mode("light")
 
-        # 组件字体
-        self.font_button = ctk.CTkFont(family=FONT_MEDIUM, size=16)
-        self.font_header = ctk.CTkFont(family=FONT_MEDIUM, size=24, weight="bold")
-        self.font_label = ctk.CTkFont(family=FONT_REGULAR, size=14)
+        # 加载字体文件
+        ctk.FontManager.load_font(FONT_REGULAR_PATH)
+        ctk.FontManager.load_font(FONT_MEDIUM_PATH)
+        
+        # 设置组件字体
+        self.font_button = ctk.CTkFont(family=FONT_MEDIUM_NAME, size=16)
+        self.font_header = ctk.CTkFont(family=FONT_MEDIUM_NAME, size=24, weight="bold")
+        self.font_label = ctk.CTkFont(family=FONT_REGULAR_NAME, size=14)
         
         self.create_header()    # 标题部分
         self.create_buttons()   # 按钮部分
