@@ -11,22 +11,26 @@ class App:
         """
         self.window = ctk.CTk()
         self.window.title("🗃 存档管理器")
-        self.window.geometry("400x290")
+        self.window.geometry("550x290")
         self.window.resizable(False, False)
-
+        self.window.configure(fg_color="#E0E5EC")
+        
         ctk.set_appearance_mode("light")
 
         # 加载字体文件
         ctk.FontManager.load_font(FONT_REGULAR_PATH)
         ctk.FontManager.load_font(FONT_MEDIUM_PATH)
-        
+
         # 设置组件字体
         self.font_button = ctk.CTkFont(family=FONT_REGULAR_NAME, size=16)
         self.font_header = ctk.CTkFont(family=FONT_MEDIUM_NAME, size=24)
         self.font_label = ctk.CTkFont(family=FONT_REGULAR_NAME, size=14)
-        
+
         self.create_header()    # 标题部分
         self.create_buttons()   # 按钮部分
+
+        # 窗口居中
+        self.center_window(self.window)
 
     def create_header(self):
         """创建标题区域，显示应用名称和图标
@@ -37,7 +41,7 @@ class App:
         header_frame = ctk.CTkFrame(self.window, fg_color="transparent")
         header_frame.pack(pady=20)
 
-        steve_image = get_image('tool', size=(32, 32))
+        steve_image = get_image('box', size=(32, 32))
         image_label = ctk.CTkLabel(header_frame, image=steve_image, text="")
         image_label.pack(side='left', padx=(0, 5), pady=(5, 0))
 
@@ -58,15 +62,15 @@ class App:
         """
         # 按钮容器
         btn_container = ctk.CTkFrame(self.window, fg_color="transparent")
-        btn_container.pack(expand=True, fill="both", padx=45)
+        btn_container.pack(padx=45)
 
         # 第一行容器
         row1 = ctk.CTkFrame(btn_container, fg_color="transparent")
-        row1.pack(fill="both")
+        row1.pack(fill="both", pady=(0, 15))
         
         # 第二行容器
         row2 = ctk.CTkFrame(btn_container, fg_color="transparent")
-        row2.pack(fill="both", pady=(20, 0))
+        row2.pack(fill="both")
 
         # 按钮默认参数
         btn_config = {
@@ -82,7 +86,7 @@ class App:
         
         
         # 第一行按钮：导入存档
-        btn1 = ctk.CTkButton(
+        import_save = ctk.CTkButton(
             row1,
             text="导入存档",
             command=self.import_save,
@@ -92,10 +96,10 @@ class App:
             image=get_image('import', (26, 26)),
             **btn_config,
         )
-        btn1.pack(side="left", padx=12)
+        import_save.pack(side="left", padx=12)
 
         # 第一行按钮：导出存档
-        btn2 = ctk.CTkButton(
+        export_save = ctk.CTkButton(
             row1,
             text="导出存档",
             command=self.export_save,
@@ -105,11 +109,11 @@ class App:
             image=get_image('export', (30, 30)),
             **btn_config,
         )
-        btn2.pack(side="left", padx=12)
+        export_save.pack(side="left", padx=12)
 
-        # 第二行按钮：存档列表
-        btn3 = ctk.CTkButton(
-            row2,
+        # 第一行按钮：存档列表
+        list_save = ctk.CTkButton(
+            row1,
             text="存档列表",
             command=self.list_saves,
             fg_color="#795431",
@@ -118,10 +122,23 @@ class App:
             image=get_image('list', (30, 30)),
             **btn_config,
         )
-        btn3.pack(side="left", padx=12)
+        list_save.pack(side="left", padx=12)
+
+        # 第二行按钮：存档修复
+        fix_save = ctk.CTkButton(
+            row2,
+            text="存档修复",
+            #command=,
+            fg_color="#D2932E",
+            hover_color="#C48828",
+            text_color="#FFF8EC",
+            image=get_image('tool', (30, 30)),
+            **btn_config,
+        )
+        fix_save.pack(side="left", padx=12)
 
         # 第二行按钮：赞助一下
-        btn4 = ctk.CTkButton(
+        donate = ctk.CTkButton(
             row2,
             text="赞助一下",
             command=self.donate,
@@ -131,7 +148,22 @@ class App:
             image=get_image('donate', (30, 30)),
             **btn_config,
         )
-        btn4.pack(side="left", padx=12)
+        donate.pack(side="left", padx=12)
+
+        # 第二行按钮：关于
+        about = ctk.CTkButton(
+            row2,
+            text="关于软件",
+            #command=,
+            fg_color="#28519D",
+            hover_color="#1F468F",
+            text_color="#E3EDFF",
+            image=get_image('about', (30, 30)),
+            **btn_config
+        )
+        about.pack(side="left", padx=12)
+        
+        
 
     def import_save(self):
         """导入存档功能，将ZIP格式的地图文件解压到Minecraft的saves文件夹
@@ -213,22 +245,6 @@ class App:
         progress_win.destroy()
         messagebox.showinfo("完成", f"成功导入 {total} 个存档")
 
-    def export_save(self):
-        """导出存档功能（待实现）
-
-        Returns:
-            None
-        """
-        messagebox.showinfo("功能开发中", "导出存档功能正在开发中，敬请期待！")
-
-    def list_saves(self):
-        """存档列表功能（待实现）
-
-        Returns:
-            None
-        """
-        messagebox.showinfo("功能开发中", "存档列表功能正在开发中，敬请期待！")
-
     def donate(self):
         """赞助功能，显示捐赠窗口，提供微信和支付宝支付选项
 
@@ -240,6 +256,7 @@ class App:
         donate_win.geometry("250x230")
         donate_win.transient(self.window)   # 置顶于主窗口
         donate_win.resizable(False, False)
+        self.center_window(donate_win)  # 窗口居中
         
         header_frame = ctk.CTkFrame(
             donate_win,
@@ -344,7 +361,7 @@ class App:
         qr_win = ctk.CTkToplevel(parent_win)
         qr_win.geometry("250x250")
         qr_win.transient(parent_win)    # 置顶于父窗口
-        qr_win.tk.call('tk::PlaceWindow', qr_win.winfo_pathname(qr_win.winfo_id()), 'center')
+        self.center_window(qr_win)  # 窗口居中
         
         if platform == "wechat":
             qr_win.title("微信赞赏码")
@@ -378,7 +395,7 @@ class App:
         progress_win.geometry("400x200")
         progress_win.transient(self.window)  # 置顶于主窗口
         progress_win.grab_set()  # 模态窗口
-        progress_win.tk.call('tk::PlaceWindow', progress_win.winfo_pathname(progress_win.winfo_id()), 'center')
+        self.center_window(progress_win)  # 窗口居中
 
         
 
@@ -411,3 +428,36 @@ class App:
         file_label.pack(pady=5)
 
         return progress_win, progress_bar, progress_label, file_label
+
+    def center_window(self, window):
+        """让窗口居中显示
+
+        Args:
+            window: 窗口对象
+
+        Returns:
+            None
+        """
+        if getattr(sys, 'frozen', False):
+            window.update_idletasks()  # 确保窗口尺寸已计算
+            window.after(50, lambda: window.tk.call(
+                'tk::PlaceWindow',
+                window.winfo_pathname(window.winfo_id()),
+                'center'
+            ))
+
+    def export_save(self):
+        """导出存档功能（待实现）
+
+        Returns:
+            None
+        """
+        messagebox.showinfo("功能开发中", "导出存档功能正在开发中，敬请期待！")
+
+    def list_saves(self):
+        """存档列表功能（待实现）
+
+        Returns:
+            None
+        """
+        messagebox.showinfo("功能开发中", "存档列表功能正在开发中，敬请期待！")
