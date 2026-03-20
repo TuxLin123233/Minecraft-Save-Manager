@@ -17,7 +17,7 @@ class PathConfig:
         # 检查是否在PyInstaller打包环境中运行
         self.frozen: bool = getattr(sys, 'frozen', False)
         if self.frozen:
-            self.temp_resource = sys._MEIPASS  # type: ignore
+            self.temp_resource = Path(sys._MEIPASS)  # type: ignore
 
         # 获取基础路径(即以项目为开头)
         self.BASE_PATH = self.get_base_path()
