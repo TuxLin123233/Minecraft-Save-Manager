@@ -2,7 +2,9 @@ from config import *
 from utils import *
 from message import Message
 
+
 class App:
+    # ==================== 1. 初始化方法 ====================
     def __init__(self):
         """GUI应用程序类初始化
 
@@ -34,6 +36,7 @@ class App:
         # 窗口居中
         center_window(self.window)
 
+    # ==================== 2. UI 创建方法 ====================
     def create_header(self):
         """创建标题区域，显示应用名称和图标
 
@@ -111,7 +114,7 @@ class App:
             **btn_config,
         )
         export_save.pack(side="left", padx=12)
-
+        
         # 第一行按钮：存档列表
         list_save = ctk.CTkButton(
             row1,
@@ -164,6 +167,7 @@ class App:
         )
         about.pack(side="left", padx=12)
         
+    # ==================== 3. 核心功能方法 ====================
     def import_save(self):
         """导入存档功能，将ZIP格式的地图文件解压到Minecraft的saves文件夹
 
@@ -189,7 +193,7 @@ class App:
                 return
         elif minecraft_path and migrate:    # 用户已记录一个版本迁移的
             # 选择版本
-            select_version = self.select_version_saves(minecraft_path)
+            select_version = self._select_version_saves(minecraft_path)
             if not select_version:
                 return 
             else:
@@ -219,7 +223,7 @@ class App:
                 data['minecraft_path'] = minecraft_path
                 if check['migrate']:    # 如果是版本迁移
                     data['migrate'] = True
-                    select_version = self.select_version_saves(minecraft_path)
+                    select_version = self._select_version_saves(minecraft_path)
                     if not select_version:
                         # 保存文件
                         write_data(data)
@@ -261,7 +265,7 @@ class App:
             return
 
         # 创建进度窗口
-        progress_win, progress_bar, progress_label, file_label = self.progress_window("导入存档")
+        progress_win, progress_bar, progress_label, file_label = self._progress_window("导入存档")
         total = len(zip_files)
 
         # 解压ZIP文件
@@ -300,7 +304,157 @@ class App:
             self.font_label
         )
     
-    def select_version_saves(self, minecraft_path) -> str:
+    def export_save(self):
+        """导出存档功能（待实现）
+
+        Returns:
+            None
+        """
+        Message(self.window).info(
+            "功能开发中",
+            "导出存档功能正在开发中，敬请期待！",
+            self.font_label
+        )
+
+    def list_saves(self):
+        """存档列表功能（待实现）
+
+        Returns:
+            None
+        """
+        Message(self.window).info(
+            "功能开发中",
+            "存档列表功能正在开发中，敬请期待！",
+            self.font_label
+        )
+
+    def donate(self):
+        """赞助功能，显示捐赠窗口，提供微信和支付宝支付选项
+
+        Returns:
+            None
+        """
+        donate_win = ctk.CTkToplevel(self.window)
+        donate_win.title("感谢支持")
+        donate_win.geometry("340x230")
+        donate_win.transient(self.window)   # 置顶于主窗口
+        donate_win.resizable(False, False)
+        center_window(donate_win)  # 窗口居中
+        
+        header_frame = ctk.CTkFrame(
+            donate_win,
+            fg_color="transparent"
+        )
+        header_frame.pack()
+        
+        # 标题
+        title = ctk.CTkLabel(
+            header_frame,
+            text="请我喝杯水",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color="#333333"
+        )
+        title.pack(side="left", pady=(15, 5), padx=(0, 5))
+        
+        # 杯子图标
+        cup_image = get_image("cup", (26, 26))
+        cup = ctk.CTkLabel(
+            master=header_frame, 
+            image=cup_image, 
+            text=""
+        )
+        cup.pack(side="left", pady=(8, 0))
+        
+        # 描述文字
+        descripbe = ctk.CTkLabel(
+            donate_win,
+            text="如果你觉得这个工具帮到了你\n欢迎请我喝杯水（≤5元就行）\n你的支持是我更新的动力!",
+            font=self.font_label,
+            text_color="#383838",
+            justify="center"
+        )
+        descripbe.pack(side="top", pady=(10, 0))
+        
+        # 按钮的配置
+        btn_config = {
+            "width": 90,
+            "height": 40,
+            "font": self.font_button,
+            "anchor": "center",      # 整体居中
+            "border_width": 2,
+            "border_color": "#CFCFCF",
+            "corner_radius": 13,
+        }
+        
+        # 按钮容器
+        buttons_row = ctk.CTkFrame(
+            donate_win,
+            fg_color="transparent",
+            height=90,
+        )
+        buttons_row.pack(pady=(12, 5))
+        
+        # 微信按钮
+        wechat_button = ctk.CTkButton(
+            buttons_row, 
+            text="微信",
+            fg_color="#07C160",
+            hover_color="#06AD56",
+            text_color="#FFFFFF",
+            command=lambda: self._show_donate_qr('wechat', donate_win),
+            **btn_config,
+        )
+        wechat_button.pack(side="left", padx=(0, 10))
+        
+        # 支付宝按钮
+        alipay_button = ctk.CTkButton(
+            buttons_row,
+            text="支付宝",
+            fg_color="#1677FF",
+            hover_color="#0D5FCC",
+            text_color="#FFFFFF",
+            command=lambda: self._show_donate_qr("alipay", donate_win),
+            **btn_config
+        )
+        alipay_button.pack(side="left")
+        
+        # 分割线
+        separator = ctk.CTkFrame(donate_win, height=2, fg_color="#E0E0E0")
+        separator.pack(fill="x", padx=20, pady=5)
+        
+        # 协议文本
+        licence_text = "图标：Tabler Icons (MIT)\n音效：Pixabay.com\n字体：HarmonyOS Sans (免费商用)"
+        
+        licence = ctk.CTkLabel(
+            donate_win,
+            text=licence_text,
+            font=self.font_label,
+            text_color="#888888",
+        )
+        licence.pack(pady=(0, 5))
+
+    def about(self):
+        """关于软件
+
+        Returns:
+            None
+        """
+        Message(self.window).info(
+            "功能开发中",
+            "关于软件功能正在开发中，敬请期待！",
+            self.font_label
+        )
+
+    # ==================== 4. 辅助功能方法 ====================
+    def _select_version_saves(self, minecraft_path) -> str:
+        """让用户选择要迁移到哪个版本
+
+        Args:
+            minecraft_path: .minecraft 文件夹路径
+
+        Returns:
+            str: 选择的版本名称，取消则返回空字符串
+        """
         btn_config = {
             "width": 90,
             "height": 40,
@@ -310,7 +464,6 @@ class App:
             "corner_radius": 13,
         }
         
-        """让用户选择要迁移到哪个版本"""
         # 获取版本列表
         if not Path(minecraft_path, 'versions').exists():
             return ""
@@ -410,112 +563,7 @@ class App:
         
         return result
     
-    def donate(self):
-        """赞助功能，显示捐赠窗口，提供微信和支付宝支付选项
-
-        Returns:
-            None
-        """
-        donate_win = ctk.CTkToplevel(self.window)
-        donate_win.title("感谢支持")
-        donate_win.geometry("340x230")
-        donate_win.transient(self.window)   # 置顶于主窗口
-        donate_win.resizable(False, False)
-        center_window(donate_win)  # 窗口居中
-        
-        header_frame = ctk.CTkFrame(
-            donate_win,
-            fg_color="transparent"
-        )
-        header_frame.pack()
-        
-        # 标题
-        title = ctk.CTkLabel(
-            header_frame,
-            text="请我喝杯水",
-            font=ctk.CTkFont(size=16, weight="bold"),
-            text_color="#333333"
-        )
-        title.pack(side="left", pady=(15, 5), padx=(0, 5))
-        
-        # 杯子图标
-        cup_image = get_image("cup", (26, 26))
-        cup = ctk.CTkLabel(
-            master=header_frame, 
-            image=cup_image, 
-            text=""
-        )
-        cup.pack(side="left", pady=(8, 0))
-        
-        # 描述文字
-        descripbe = ctk.CTkLabel(
-            donate_win,
-            text="如果你觉得这个工具帮到了你\n欢迎请我喝杯水（≤5元就行）\n你的支持是我更新的动力!",
-            font=self.font_label,
-            text_color="#383838",
-            justify="center"
-        )
-        descripbe.pack(side="top", pady=(10, 0))
-        
-        # 按钮的配置
-        btn_config = {
-            "width": 90,
-            "height": 40,
-            "font": self.font_button,
-            "anchor": "center",      # 整体居中
-            "border_width": 2,
-            "border_color": "#CFCFCF",
-            "corner_radius": 13,
-        }
-        
-        # 按钮容器
-        buttons_row = ctk.CTkFrame(
-            donate_win,
-            fg_color="transparent",
-            height=90,
-        )
-        buttons_row.pack(pady=(12, 5))
-        
-        # 微信按钮
-        wechat_button = ctk.CTkButton(
-            buttons_row, 
-            text="微信",
-            fg_color="#07C160",
-            hover_color="#06AD56",
-            text_color="#FFFFFF",
-            command=lambda: self.show_donate_qr('wechat', donate_win),
-            **btn_config,
-        )
-        wechat_button.pack(side="left", padx=(0, 10))
-        
-        # 支付宝按钮
-        alipay_button = ctk.CTkButton(
-            buttons_row,
-            text="支付宝",
-            fg_color="#1677FF",
-            hover_color="#0D5FCC",
-            text_color="#FFFFFF",
-            command=lambda: self.show_donate_qr("alipay", donate_win),
-            **btn_config
-        )
-        alipay_button.pack(side="left")
-        
-        # 分割线
-        separator = ctk.CTkFrame(donate_win, height=2, fg_color="#E0E0E0")
-        separator.pack(fill="x", padx=20, pady=5)
-        
-        # 协议文本
-        licence_text = "图标：Tabler Icons (MIT)\n音效：Pixabay.com\n字体：HarmonyOS Sans (免费商用)"
-        
-        licence = ctk.CTkLabel(
-            donate_win,
-            text=licence_text,
-            font=self.font_label,
-            text_color="#888888",
-        )
-        licence.pack(pady=(0, 5))
-
-    def show_donate_qr(self, platform:str, parent_win:ctk.CTkToplevel):
+    def _show_donate_qr(self, platform:str, parent_win:ctk.CTkToplevel):
         """展示赞助码二维码窗口
 
         Args:
@@ -546,7 +594,7 @@ class App:
         # 延迟设置模态，避免 grab failed
         qr_win.after(100, qr_win.grab_set)         
     
-    def progress_window(self, text: str):
+    def _progress_window(self, text: str):
         """创建进度条窗口
 
         Args:
@@ -594,38 +642,3 @@ class App:
         file_label.pack(pady=5)
 
         return progress_win, progress_bar, progress_label, file_label
-
-    def about(self):
-        """关于软件
-        Returns:
-            None
-        """
-        Message(self.window).info(
-            "功能开发中",
-            "关于软件功能正在开发中，敬请期待！",
-            self.font_label
-        )
-
-    def export_save(self):
-        """导出存档功能（待实现）
-
-        Returns:
-            None
-        """
-        Message(self.window).info(
-            "功能开发中",
-            "导出存档功能正在开发中，敬请期待！",
-            self.font_label
-        )
-
-    def list_saves(self):
-        """存档列表功能（待实现）
-
-        Returns:
-            None
-        """
-        Message(self.window).info(
-            "功能开发中",
-            "存档列表功能正在开发中，敬请期待！",
-            self.font_label
-        )
