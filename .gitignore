@@ -26,3 +26,5 @@ Thumbs.db
 # Python 缓存
 __pycache__/
 *.pyc
+
+.qoder/
