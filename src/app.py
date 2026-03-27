@@ -4,9 +4,22 @@ from message import Message
 
 
 class App:
-    # ==================== 1. 初始化方法 ====================
+    # ==================== 初始化方法 ====================
     def __init__(self):
         """GUI应用程序类初始化
+        
+        逻辑流程:
+            创建主窗口
+            ↓
+            设置窗口属性 (尺寸、标题、颜色)
+            ↓
+            加载字体文件
+            ↓
+            创建 UI (标题 + 按钮)
+            ↓
+            窗口居中
+            ↓
+            播放启动音效
 
         Returns:
             None
@@ -34,10 +47,18 @@ class App:
 
         # 窗口居中
         center_window(self.window)
+        playsound(path_config.get_sound_path("start.mp3"), block=False)
 
-    # ==================== 2. UI 创建方法 ====================
+    # ==================== UI 创建方法 ====================
     def create_header(self):
         """创建标题区域，显示应用名称和图标
+        
+        逻辑流程:
+            创建透明容器
+            ↓
+            加载并显示图标
+            ↓
+            显示应用标题 "存档管理器"
 
         Returns:
             None
@@ -45,9 +66,9 @@ class App:
         header_frame = ctk.CTkFrame(self.window, fg_color="transparent")
         header_frame.pack(pady=20)
 
-        steve_image = get_image('icon', size=(32, 32))
+        steve_image = get_image("icon", size=(32, 32))
         image_label = ctk.CTkLabel(header_frame, image=steve_image, text="")
-        image_label.pack(side='left', padx=(0, 10))
+        image_label.pack(side="left", padx=(0, 10))
 
         # 大标题
         title = ctk.CTkLabel(
@@ -60,6 +81,17 @@ class App:
 
     def create_buttons(self):
         """创建功能按钮区域，包含导入存档、导出存档、存档列表、赞助一下四个按钮
+        
+        逻辑流程:
+            创建按钮容器
+            ├─ 第一行按钮
+            │   ├─ 导入存档
+            │   ├─ 导出存档 (待实现)
+            │   └─ 存档列表 (待实现)
+            └─ 第二行按钮
+                ├─ 存档修复 (待实现)
+                ├─ 赞助一下
+                └─ 关于软件 (待实现)
 
         Returns:
             None
@@ -96,7 +128,7 @@ class App:
             fg_color="#2c4068",
             hover_color="#1d2f53",
             text_color="#cfdaf2",
-            image=get_image('import', (26, 26)),
+            image=get_image("import", (26, 26)),
             **btn_config,
         )
         import_save.pack(side="left", padx=12)
@@ -109,7 +141,7 @@ class App:
             fg_color="#793231",
             hover_color="#682d2c",
             text_color="#FBE3E3",
-            image=get_image('export', (30, 30)),
+            image=get_image("export", (30, 30)),
             **btn_config,
         )
         export_save.pack(side="left", padx=12)
@@ -122,7 +154,7 @@ class App:
             fg_color="#795431",
             hover_color="#614021",
             text_color="#FFECDB",
-            image=get_image('list', (30, 30)),
+            image=get_image("list", (30, 30)),
             **btn_config,
         )
         list_save.pack(side="left", padx=12)
@@ -135,7 +167,7 @@ class App:
             fg_color="#D2932E",
             hover_color="#C48828",
             text_color="#FFF8EC",
-            image=get_image('tool', (30, 30)),
+            image=get_image("tool", (30, 30)),
             **btn_config,
         )
         fix_save.pack(side="left", padx=12)
@@ -148,7 +180,7 @@ class App:
             fg_color="#6E9D28",
             hover_color="#638F22",
             text_color="#F7FFEC",
-            image=get_image('donate', (30, 30)),
+            image=get_image("donate", (30, 30)),
             **btn_config,
         )
         donate.pack(side="left", padx=12)
@@ -161,99 +193,44 @@ class App:
             fg_color="#28519D",
             hover_color="#1F468F",
             text_color="#E3EDFF",
-            image=get_image('about', (30, 30)),
+            image=get_image("about", (30, 30)),
             **btn_config
         )
         about.pack(side="left", padx=12)
-        
-    # ==================== 3. 核心功能方法 ====================
+    
+    # ==================== 核心功能方法 ====================
     def import_save(self):
         """导入存档功能，将ZIP格式的地图文件解压到Minecraft的saves文件夹
+        
+        逻辑流程:
+            读取用户配置 (data.json)
+            ↓
+            获取 Minecraft saves 路径 → _get_saves_path()
+            ↓ (失败返回)
+            选择 ZIP 文件夹
+            ↓ (取消返回)
+            获取 ZIP 文件列表
+            ↓ (无文件提示错误)
+            批量解压 ZIP → _extract_zip_files()
 
         Returns:
             None
         """
-        # 获取.minecraft路径
+        # 获取数据文件
         data = read_data()  # 获取数据文件
-        minecraft_path = data['minecraft_path'] # 获取.minecraft文件夹
-        migrate = data['migrate']
         
-        saves_path:str = ""
-
-        # 检查并确认.minecraft路径
+        # 获取.minecraft路径
+        saves_path = self._get_saves_path(data=data)
+        if saves_path is None:  # 获取到了saves文件夹了路径
+            return
         
-        # 检查用户是否已经保存过.minecraft文件夹路径
-        if minecraft_path and not migrate:  # 用户已记录一个没有版本迁移minecraft文件夹路径
-            saves_path = str(Path(minecraft_path, 'saves'))
-            # 选择ZIP文件夹
-            zip_folder_path = folder_dialog("选择存放地图ZIP的文件夹")
-            # 如果用户取消了文件夹选择，直接返回
-            if not zip_folder_path:
-                return
-        elif minecraft_path and migrate:    # 用户已记录一个版本迁移的
-            # 选择版本
-            select_version = self._select_version_saves(minecraft_path)
-            if not select_version:
-                return 
-            else:
-                saves_path = str(Path(minecraft_path, 'versions', select_version, 'saves'))
-            # 选择ZIP文件夹
-            zip_folder_path = folder_dialog("选择存放地图ZIP的文件夹")
-            if not zip_folder_path:
-                return
-        else:  # 如果没有记录
-            # 询问用户是否愿意提供.minecraft文件夹路径
-            result = Message(self.window).yes_no(
-                "温馨提示",
-                "导入存档前，请告诉我你的.minecraft文件夹地址",
-                self.font_label
-            )
-            if not result: return 
-            
-            minecraft_path:str = folder_dialog("选择.minecraft文件夹")
-            # 检查用户是否选择了文件夹（可能点击了取消）
-            if not minecraft_path: return
-
-            check:dict = is_minecraft_folder(minecraft_path)
-            
-            # 检查用户是否确认并提供有效的.minecraft/saves文件夹
-            if result and check['find']:
-                # 保存minecraft路径到配置文件
-                data['minecraft_path'] = minecraft_path
-                if check['migrate']:    # 如果是版本迁移
-                    data['migrate'] = True
-                    select_version = self._select_version_saves(minecraft_path)
-                    if not select_version:
-                        # 保存文件
-                        write_data(data)
-                        return
-                    else:
-                        saves_path = str(Path(minecraft_path, 'versions', select_version, 'saves'))
-                else:   # 不是版本迁移
-                    saves_path = str(Path(minecraft_path, 'saves'))
-                    # 保存文件
-                    write_data(data)
-            else:
-                # 用户取消或提供的路径无效，直接返回
-                Message(self.window).info(
-                    "错误",
-                    "不是有效的.minecraft文件夹",
-                    self.font_label
-                )
-                return
-
-            Message(self.window).info(
-                "提示",
-                "成功! 现在来导入地图",
-                self.font_label
-            )
-            # 选择ZIP文件夹
-            zip_folder_path = folder_dialog("选择存放地图ZIP的文件夹")
-            # 检查用户是否取消了第二次文件夹选择
-            if not zip_folder_path: return # 用户取消了
+        # 选择ZIP文件夹
+        zip_folder_path = folder_dialog("选择存放地图ZIP的文件夹")
+        # 检查用户是否取消了第二次文件夹选择
+        if not zip_folder_path: return # 用户取消了
 
         # 获取ZIP文件列表
-        zip_files = list(Path(zip_folder_path).glob('*.zip'))
+        zip_files = list(Path(zip_folder_path).glob("*.zip"))
         # 检查是否在选择的文件夹中找到任何ZIP文件
         if not zip_files:
             Message(self.window).info(
@@ -263,45 +240,8 @@ class App:
             )
             return
 
-        # 创建进度窗口
-        progress_win, progress_bar, progress_label, file_label = self._progress_window("导入存档")
-        total = len(zip_files)
-
-        # 解压ZIP文件
-        success_count = 0
-        for i, zip_file in enumerate(zip_files, 1):
-            # 获取ZIP文件名（不含扩展名）
-            name = Path(zip_file).stem
-            target = Path(saves_path) / name
-            
-            if target.exists():
-                result = Message(self.window).yes_no("存档已存在", f"{name} 存档已存在，是否覆盖", self.font_label)
-                if not result:  # 不要覆盖
-                    continue    # 进行跳过
-                else:   # 进行覆盖
-                    shutil.rmtree(target)
-            
-            # 更新进度显示
-            file_label.configure(text=f"正在处理世界: {name}")
-            progress_bar.set(i / total)
-            progress_label.configure(text=f"{int(i / total * 100)}% ({i}/{total})")
-            progress_win.update()
-                
-            # 执行解压操作
-            zip_extract(
-                zip_path=str(zip_file),
-                extract_path=str(saves_path),
-                name=name
-            )
-            success_count += 1
-
-        # 完成后关闭进度条窗口
-        progress_win.destroy()
-        Message(self.window).info(
-            "完成",
-            f"成功导入 {success_count} 个存档",
-            self.font_label
-        )
+        # 进行逐个解压
+        self._extract_zip_files(zip_files=zip_files, saves_path=saves_path)
     
     def export_save(self):
         """导出存档功能（待实现）
@@ -329,6 +269,17 @@ class App:
 
     def donate(self):
         """赞助功能，显示捐赠窗口，提供微信和支付宝支付选项
+        
+        逻辑流程:
+            创建赞助窗口
+            ↓
+            显示标题和杯子图标
+            ↓
+            显示描述文字
+            ↓
+            显示微信/支付宝按钮
+            ↓
+            点击按钮 → 显示二维码 → _show_donate_qr()
 
         Returns:
             None
@@ -365,14 +316,14 @@ class App:
         cup.pack(side="left", pady=(8, 0))
         
         # 描述文字
-        descripbe = ctk.CTkLabel(
+        describe = ctk.CTkLabel(
             donate_win,
             text="如果你觉得这个工具帮到了你\n欢迎请我喝杯水（≤5元就行）\n你的支持是我更新的动力!",
             font=self.font_label,
             text_color="#383838",
             justify="center"
         )
-        descripbe.pack(side="top", pady=(10, 0))
+        describe.pack(side="top", pady=(10, 0))
         
         # 按钮的配置
         btn_config = {
@@ -400,7 +351,7 @@ class App:
             fg_color="#07C160",
             hover_color="#06AD56",
             text_color="#FFFFFF",
-            command=lambda: self._show_donate_qr('wechat', donate_win),
+            command=lambda: self._show_donate_qr("wechat", donate_win),
             **btn_config,
         )
         wechat_button.pack(side="left", padx=(0, 10))
@@ -444,9 +395,120 @@ class App:
             self.font_label
         )
 
-    # ==================== 4. 辅助功能方法 ====================
+    # ==================== 辅助功能方法 ====================
+    def _get_saves_path(self, data:dict) -> str|None:
+        """获取 Minecraft saves 文件夹路径
+        
+        逻辑流程:
+            检查是否已有配置
+            ├─ 分支 1: 已有路径 + 非版本迁移
+            │   └─ 返回 minecraft_path/saves
+            ├─ 分支 2: 已有路径 + 版本迁移
+            │   ├─ 选择游戏版本 → _select_version_saves()
+            │   └─ 返回 minecraft_path/versions/{版本}/saves
+            └─ 分支 3: 无配置
+                ├─ 询问用户
+                ├─ 选择 .minecraft 文件夹
+                ├─ 验证文件夹有效性
+                ├─ 保存配置到 data.json
+                └─ 返回相应的 saves 路径
+
+        Args:
+            data: 用户配置字典
+
+        Returns:
+            str|None: saves文件夹路径，失败返回None
+        """
+        minecraft_path = data["minecraft_path"]
+        migrate:bool = data["migrate"]
+        saves_path:str = ""
+        
+        # 检查用户是否已经保存过.minecraft文件夹路径
+        if minecraft_path and not migrate:  # 用户已记录一个没有版本迁移minecraft文件夹路径
+            saves_path = str(Path(minecraft_path, "saves"))
+            return saves_path
+        elif minecraft_path and migrate:    # 用户已记录一个版本迁移的
+            # 选择版本
+            select_version = self._select_version_saves(minecraft_path)
+            if not select_version:
+                return None
+            else:
+                saves_path = str(Path(minecraft_path, "versions", select_version, "saves"))
+                return saves_path
+        else:  # 如果没有记录
+            # 询问用户是否愿意提供.minecraft文件夹路径
+            result = Message(self.window).yes_no(
+                "温馨提示",
+                "导入存档前，请告诉我你的.minecraft文件夹地址",
+                self.font_label
+            )
+            if not result: 
+                return None
+            
+            minecraft_path:str = folder_dialog("选择.minecraft文件夹")
+            
+            # 检查用户是否选择了文件夹（可能点击了取消）
+            if not minecraft_path: 
+                return None
+
+            check:dict = is_minecraft_folder(minecraft_path)
+            
+            # 检查用户是否确认并提供有效的.minecraft/saves文件夹
+            if check["find"] and check["migrate"]:    # 如果是版本迁移
+                data["minecraft_path"] = minecraft_path
+                data["migrate"] = True
+                
+                # 让用户选择迁移版本
+                select_version = self._select_version_saves(minecraft_path)
+                if not select_version:  # 用户没有选择版本
+                    # 保存文件
+                    write_data(data)
+                    return None
+                else:
+                    saves_path = str(Path(minecraft_path, "versions", select_version, "saves"))
+                    # 保存文件
+                    write_data(data)
+                    Message(self.window).info(
+                        "提示",
+                        "成功! 现在来导入地图",
+                        self.font_label
+                    )
+                    return saves_path
+
+            elif check["find"] and not check["migrate"]:   # 不是版本迁移
+                data["minecraft_path"] = minecraft_path
+                saves_path = str(Path(minecraft_path, "saves"))
+                
+                Message(self.window).info(
+                    "提示",
+                    "成功! 现在来导入地图",
+                    self.font_label
+                )
+                
+                # 保存文件
+                write_data(data)
+                return saves_path
+            elif not check["find"]:
+                # 用户取消或提供的路径无效，直接返回
+                Message(self.window).info(
+                    "错误",
+                    "不是有效的.minecraft文件夹",
+                    self.font_label
+                )
+                return None
     def _select_version_saves(self, minecraft_path) -> str:
         """让用户选择要迁移到哪个版本
+        
+        逻辑流程:
+            检查 versions 文件夹是否存在
+            ↓
+            获取版本列表
+            ↓
+            创建版本选择窗口
+            ↓
+            显示单选按钮列表
+            ↓
+            用户确认 → 返回选中的版本
 
         Args:
             minecraft_path: .minecraft 文件夹路径
@@ -464,10 +526,10 @@ class App:
         }
         
         # 获取版本列表
-        if not Path(minecraft_path, 'versions').exists():
+        if not Path(minecraft_path, "versions").exists():
             return ""
         
-        versions_folders = Path(minecraft_path, 'versions').iterdir()
+        versions_folders = Path(minecraft_path, "versions").iterdir()
         versions_names = [p.name for p in versions_folders]
         if not versions_names:
             return ""
@@ -564,9 +626,18 @@ class App:
     
     def _show_donate_qr(self, platform:str, parent_win:ctk.CTkToplevel):
         """展示赞助码二维码窗口
+        
+        逻辑流程:
+            创建二维码窗口
+            ↓
+            根据平台设置标题
+            ↓
+            加载并显示二维码图片
+            ↓
+            设置为模态窗口
 
         Args:
-            platform (str): 支付平台类型，可选值为 'wechat'（微信）或 'alipay'（支付宝）
+            platform (str): 支付平台类型，可选值为 "wechat"（微信）或 "alipay"（支付宝）
             parent_win (ctk.CTkToplevel): 父窗口对象，用于设置模态窗口关系
 
         Returns:
@@ -595,6 +666,19 @@ class App:
     
     def _progress_window(self, text: str):
         """创建进度条窗口
+        
+        逻辑流程:
+            创建进度窗口
+            ↓
+            显示标题
+            ↓
+            创建进度条组件
+            ↓
+            创建进度文字标签
+            ↓
+            创建文件名标签
+            ↓
+            返回所有组件引用
 
         Args:
             text (str): 进度条标题文本
@@ -641,3 +725,66 @@ class App:
         file_label.pack(pady=5)
 
         return progress_win, progress_bar, progress_label, file_label
+
+    def _extract_zip_files(self, zip_files, saves_path):
+        """批量解压ZIP文件到指定目录
+        
+        逻辑流程:
+            创建进度窗口
+            ↓
+            遍历所有 ZIP 文件
+            ├─ 检查存档是否已存在
+            │   └─ 询问是否覆盖
+            ├─ 更新进度显示
+            └─ 执行解压 → zip_extract()
+            ↓
+            关闭进度窗口
+            ↓
+            显示完成提示
+
+        Args:
+            zip_files: ZIP文件列表
+            saves_path: 目标saves文件夹路径
+
+        Returns:
+            None
+        """
+        # 创建进度窗口
+        progress_win, progress_bar, progress_label, file_label = self._progress_window("导入存档")
+        total = len(zip_files)  # 任务量
+
+        # 解压ZIP文件
+        success_count = 0
+        for i, zip_file in enumerate(zip_files, 1):
+            # 获取ZIP文件名（不含扩展名）
+            name = Path(zip_file).stem
+            target = Path(saves_path) / name
+            
+            if target.exists():
+                result = Message(self.window).yes_no("存档已存在", f"{name} 存档已存在，是否覆盖", self.font_label)
+                if not result:  # 不要覆盖
+                    continue    # 进行跳过
+                else:   # 进行覆盖
+                    shutil.rmtree(target)
+            
+            # 更新进度显示
+            file_label.configure(text=f"正在处理世界: {name}")
+            progress_bar.set(i / total)
+            progress_label.configure(text=f"{int(i / total * 100)}% ({i}/{total})")
+            progress_win.update()
+                
+            # 执行解压操作
+            zip_extract(
+                zip_path=str(zip_file),
+                extract_path=str(saves_path),
+                name=name
+            )
+            success_count += 1
+
+        # 完成后关闭进度条窗口
+        progress_win.destroy()
+        Message(self.window).info(
+            "完成",
+            f"成功导入 {success_count} 个存档",
+            self.font_label
+        )
