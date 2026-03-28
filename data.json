@@ -1,4 +1,4 @@
 {
-  "minecraft_path": "",
-  "migrate": false
+  "minecraft_path": "/home/tux/编程/存档管理器/Test/.minecraft-versions",
+  "migrate": true
 }

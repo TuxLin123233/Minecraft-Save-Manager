@@ -120,3 +120,8 @@ class PathConfig:
             return self.SOUND_PATH / sound_name
 
 path_config = PathConfig()
+
+data_defalut = {
+    "minecraft_path": "",
+    "migrate": False
+}

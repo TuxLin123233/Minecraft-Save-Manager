@@ -45,9 +45,9 @@ class App:
         self.create_header()    # 标题部分
         self.create_buttons()   # 按钮部分
 
+        playsound(path_config.get_sound_path("start.mp3"), block=False)
         # 窗口居中
         center_window(self.window)
-        playsound(path_config.get_sound_path("start.mp3"), block=False)
 
     # ==================== UI 创建方法 ====================
     def create_header(self):

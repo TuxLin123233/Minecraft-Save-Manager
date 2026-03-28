@@ -7,6 +7,8 @@ def zip_extract(zip_path: str, extract_path: str, name: str) -> None:
     逻辑流程:
         检查临时目录是否存在，不存在则创建
         ↓
+        验证ZIP文件有效性
+        ↓
         解压ZIP文件到临时目录
         ↓
         获取临时目录中的所有内容
@@ -24,9 +26,17 @@ def zip_extract(zip_path: str, extract_path: str, name: str) -> None:
 
     Returns:
         None
+        
+    Raises:
+        zipfile.BadZipFile: 如果文件不是有效的ZIP文件
+        ValueError: 如果ZIP文件中没有可提取的内容
     """
     if not path_config.TEMP_PATH.exists():
         path_config.TEMP_PATH.mkdir(exist_ok=True)
+
+    # 验证ZIP文件有效性
+    if not zipfile.is_zipfile(zip_path):
+        raise zipfile.BadZipFile(f"文件不是有效的ZIP文件: {zip_path}")
 
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
         zip_ref.extractall(path_config.TEMP_PATH)
@@ -145,10 +155,7 @@ def read_data() -> dict:
         dict: 配置数据字典，如果文件不存在则返回默认配置
     """
     if not path_config.DATA_PATH.exists():
-        return {
-            "minecraft_path": "",
-            "migrate": False
-        }
+        return data_defalut
     with open(path_config.DATA_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
     

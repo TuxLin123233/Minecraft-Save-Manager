@@ -10,6 +10,9 @@ __pycache__/
 *.pyo
 *.pyd
 
+# 测试环境
+Test/
+
 # 打包文件
 dist/
 build/
@@ -22,9 +25,3 @@ build/
 # 系统文件
 .DS_Store
 Thumbs.db
-
-# Python 缓存
-__pycache__/
-*.pyc
-
-.qoder/*
