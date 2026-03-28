@@ -56,17 +56,17 @@ def get_image(image_name: str, size: tuple) -> ctk.CTkImage:
         检查是否在PyInstaller打包环境中运行
         ├─ 打包环境
         │   ├─ 获取临时解压目录 (sys._MEIPASS)
-        │   └─ 构建图片路径 (sys._MEIPASS/img/{name}.png)
+        │   └─ 构建图片路径 (sys._MEIPASS/icon/{name}.png 或 sys._MEIPASS/img/{name}.png)
         └─ 开发环境
             ├─ 获取项目根目录
-            └─ 构建图片路径 (项目根目录/img/{name}.png)
+            └─ 构建图片路径 (项目根目录/icon/{name}.png 或 项目根目录/img/{name}.png)
         ↓
         打开PIL图像
         ↓
         创建CTkImage对象并返回
 
     Args:
-        image_name: img文件夹中的PNG文件名（不含扩展名）
+        image_name: icon或img文件夹中的PNG文件名（不含扩展名）
         size: 图片尺寸元组 (width, height)
 
     Returns:
@@ -76,11 +76,17 @@ def get_image(image_name: str, size: tuple) -> ctk.CTkImage:
     
     if getattr(sys, "frozen", False):
         base_path = sys._MEIPASS    # type:ignore
-        img_path = Path(base_path, "img", f"{image_name}.png")
+        # 优先从icon文件夹查找，找不到再从img文件夹查找
+        img_path = Path(base_path, "icon", f"{image_name}.png")
+        if not img_path.exists():
+            img_path = Path(base_path, "img", f"{image_name}.png")
     else:
         base_dir = Path(__file__).parent
         project_root = base_dir.parent
-        img_path = project_root / "img" / f"{image_name}.png"
+        # 优先从icon文件夹查找，找不到再从img文件夹查找
+        img_path = project_root / "icon" / f"{image_name}.png"
+        if not img_path.exists():
+            img_path = project_root / "img" / f"{image_name}.png"
     
     pil_image = Image.open(img_path)
     
