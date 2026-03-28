@@ -38,9 +38,7 @@ class App:
         ctk.FontManager.load_font(str(path_config.FONT_MEDIUM_PATH))
 
         # 设置组件字体
-        self.font_button = ctk.CTkFont(family=path_config.FONT_REGULAR_NAME, size=16)
-        self.font_header = ctk.CTkFont(family=path_config.FONT_MEDIUM_NAME, size=24)
-        self.font_label = ctk.CTkFont(family=path_config.FONT_REGULAR_NAME, size=14)
+        self.font_text = lambda size, weight="normal": ctk.CTkFont(family=path_config.FONT_REGULAR_NAME, size=size, weight=weight)  # type:ignore
 
         self.create_header()    # 标题部分
         self.create_buttons()   # 按钮部分
@@ -74,7 +72,7 @@ class App:
         title = ctk.CTkLabel(
             header_frame,
             text="存档管理器",
-            font=self.font_header,
+            font=self.font_text(24),
             text_color="#333333",
         )
         title.pack(side="left")
@@ -112,7 +110,7 @@ class App:
         btn_config = {
             "width": 130,
             "height": 85,
-            "font": self.font_button,
+            "font": self.font_text(16),
             "compound": "bottom",    # 文字在底部，图片在顶部
             "anchor": "center",      # 整体居中
             "border_width": 4,
@@ -236,7 +234,7 @@ class App:
             Message(self.window).info(
                 "错误",
                 "选择的文件夹中没有找到ZIP文件",
-                self.font_label
+                self.font_text(14)
             )
             return
 
@@ -252,20 +250,97 @@ class App:
         Message(self.window).info(
             "功能开发中",
             "导出存档功能正在开发中，敬请期待！",
-            self.font_label
+            self.font_text(14)
         )
 
     def list_saves(self):
-        """存档列表功能（待实现）
+        """存档列表功能，显示所有存档的列表
+        
+        逻辑流程:
+            获取存档列表信息 → get_saves_data()
+            ↓ (无存档返回)
+            检查是否有存档
+            ↓
+            创建存档列表窗口
+            ↓
+            创建可滚动框架
+            ↓
+            遍历所有版本和存档
+            ├─ 创建卡片框架
+            ├─ 添加存档名称标签
+            └─ 添加版本号标签
+            ↓
+            显示存档列表窗口
 
         Returns:
             None
         """
-        Message(self.window).info(
-            "功能开发中",
-            "存档列表功能正在开发中，敬请期待！",
-            self.font_label
+        # 获取存档列表信息
+        saves_data = get_saves_data()
+        if saves_data is None:
+           Message(self.window).info(
+               "错误",
+               "未检测到任何存档",
+               self.font_text(14)
+           )
+           return
+        # 创建存档列表窗口
+        saves_win = ctk.CTkToplevel(self.window)
+        saves_win.title("存档列表")
+        saves_win.geometry("400x300")
+        saves_win.transient(self.window)   # 置顶于主窗口
+        saves_win.resizable(False, False)
+        saves_win.update()  # 确保窗口已显示
+        saves_win.grab_set()
+        center_window(saves_win)  # 窗口居中
+        
+        # 创建可滚动框架
+        scroll_frame = ctk.CTkScrollableFrame(
+            saves_win,
+            width=400,
+            height=300,
+            fg_color="transparent",
         )
+        scroll_frame.pack(side="top", fill="both")
+        
+        for i in saves_data:
+            for j in saves_data[i]:
+                # 单个卡片框架
+                card = ctk.CTkFrame(
+                    scroll_frame,
+                    width=350,
+                    height=50,
+                    fg_color="transparent",
+                    border_color="#DDDDDD",
+                    border_width=2,
+                    corner_radius=5,
+                )
+                card.pack(side="top", pady=(10, 0), padx=5, fill="x")
+                
+                # 文本框架
+                text_frame = ctk.CTkFrame(
+                    card,
+                    fg_color="transparent",
+                )
+                text_frame.pack(side="left", pady=(5, 5), padx=(5, 0))
+                
+                # 存档名称
+                save_name = ctk.CTkLabel(
+                    text_frame,
+                    text=f"{limit_name_length(j, 30)}",
+                    font=self.font_text(14, 'bold'),
+                    text_color="#63835D",
+                )
+                save_name.pack(side="top", anchor="w", padx=(15, 0))
+                
+                # 版本号
+                version_name = ctk.CTkLabel(
+                    text_frame,
+                    text=f"{i}",
+                    font=self.font_text(13, 'bold'),   
+                    text_color="#434343",
+                )
+                version_name.pack(side="top", anchor="w", padx=(15, 0))                
 
     def donate(self):
         """赞助功能，显示捐赠窗口，提供微信和支付宝支付选项
@@ -319,7 +394,7 @@ class App:
         describe = ctk.CTkLabel(
             donate_win,
             text="如果你觉得这个工具帮到了你\n欢迎请我喝杯水（≤5元就行）\n你的支持是我更新的动力!",
-            font=self.font_label,
+            font=self.font_text(14),
             text_color="#383838",
             justify="center"
         )
@@ -329,7 +404,7 @@ class App:
         btn_config = {
             "width": 90,
             "height": 40,
-            "font": self.font_button,
+            "font": self.font_text(16),
             "anchor": "center",      # 整体居中
             "border_width": 2,
             "border_color": "#CFCFCF",
@@ -378,13 +453,18 @@ class App:
         licence = ctk.CTkLabel(
             donate_win,
             text=licence_text,
-            font=self.font_label,
+            font=self.font_text(14),
             text_color="#888888",
         )
         licence.pack(pady=(0, 5))
 
     def about(self):
-        """关于软件
+        """关于软件功能，显示软件信息（待实现）
+        
+        逻辑流程:
+            显示提示信息
+            ↓
+            告知用户功能正在开发中
 
         Returns:
             None
@@ -392,7 +472,7 @@ class App:
         Message(self.window).info(
             "功能开发中",
             "关于软件功能正在开发中，敬请期待！",
-            self.font_label
+            self.font_text(14)
         )
 
     # ==================== 辅助功能方法 ====================
@@ -440,7 +520,7 @@ class App:
             result = Message(self.window).yes_no(
                 "温馨提示",
                 "导入存档前，请告诉我你的.minecraft文件夹地址",
-                self.font_label
+                self.font_text(14)
             )
             if not result: 
                 return None
@@ -471,7 +551,7 @@ class App:
                     Message(self.window).info(
                         "提示",
                         "成功! 现在来导入地图",
-                        self.font_label
+                        self.font_text(14)
                     )
                     return saves_path
 
@@ -482,7 +562,7 @@ class App:
                 Message(self.window).info(
                     "提示",
                     "成功! 现在来导入地图",
-                    self.font_label
+                    self.font_text(14)
                 )
                 
                 # 保存文件
@@ -493,7 +573,7 @@ class App:
                 Message(self.window).info(
                     "错误",
                     "不是有效的.minecraft文件夹",
-                    self.font_label
+                    self.font_text(14)
                 )
                 return None
     def _select_version_saves(self, minecraft_path) -> str:
@@ -573,7 +653,7 @@ class App:
             label = ctk.CTkLabel(
                 frame,
                 text=name,
-                font=self.font_button,
+                font=self.font_text(14),
             )
             label.pack(side="left")
 
@@ -761,7 +841,7 @@ class App:
             target = Path(saves_path) / name
             
             if target.exists():
-                result = Message(self.window).yes_no("存档已存在", f"{name} 存档已存在，是否覆盖", self.font_label)
+                result = Message(self.window).yes_no("存档已存在", f"{name} 存档已存在，是否覆盖", self.font_text(14))
                 if not result:  # 不要覆盖
                     continue    # 进行跳过
                 else:   # 进行覆盖
@@ -786,5 +866,5 @@ class App:
         Message(self.window).info(
             "完成",
             f"成功导入 {success_count} 个存档",
-            self.font_label
+            self.font_text(14)
         )

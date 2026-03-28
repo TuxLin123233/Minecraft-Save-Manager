@@ -259,3 +259,68 @@ def is_minecraft_folder(minecraft_path) -> dict:
         result["migrate"] = True
         
     return result
+
+def get_saves_data() -> dict|list|None:
+    """获取存档列表
+    
+    逻辑流程:
+        读取配置文件 → read_data()
+        ↓
+        检查是否为版本迁移结构
+        ├─ 是: 遍历 versions 目录
+        │   ├─ 获取版本列表
+        │   ├─ 遍历每个版本的 saves 目录
+        │   └─ 收集存档名称
+        └─ 否: 遍历主 saves 目录
+            ├─ 获取存档列表
+            └─ 收集存档名称
+        ↓
+        返回存档数据
+
+    Returns:
+        dict|list|None: 
+            - 版本迁移结构: 返回字典 {版本名: [存档列表]}
+            - 标准结构: 返回列表 [存档列表]
+            - 无配置: 返回 None
+    """
+    data = read_data()  # 获取配置文件
+    minecraft_path = data['minecraft_path'] 
+    
+    result = []
+    
+    if minecraft_path and data['migrate']:     # 为版本迁移
+        result = {}
+        version_list = list(Path(minecraft_path, 'versions').glob('*'))
+        for version in version_list:
+            result[version.name] = []
+            saves_list = list(Path(version, 'saves').glob('*'))
+            for save in saves_list:
+                result[version.name].append(save.name)
+    elif minecraft_path and data['migrate']:
+        saves_list = list(Path(minecraft_path).glob("*"))
+        for save in saves_list:
+            result.append(save.name)
+    elif not minecraft_path:
+        return None
+        
+    return result
+
+def limit_name_length(name:str, max_length:int=20) -> str:
+    """限制名称长度
+    
+    逻辑流程:
+        检查名称长度是否超过最大长度
+        ├─ 超过: 截断名称到最大长度
+        └─ 未超过: 返回原始名称
+
+    Args:
+        name: 原始名称
+        max_length: 最大允许长度，默认20
+
+    Returns:
+        str: 限制后的名称
+    """
+    if len(name) > max_length:
+        return name[:max_length] + "..."
+    
+    return name

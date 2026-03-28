@@ -15,7 +15,7 @@ class Message:
         ↓
         配置按钮样式
     """
-    def __init__(self, parent_window:ctk.CTk) -> None:
+    def __init__(self, parent_window:ctk.CTk|ctk.CTkToplevel) -> None:
         """初始化消息对话框
         
         逻辑流程:
