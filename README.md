@@ -1,5 +1,11 @@
 # 🗃️ 存档管理器
 
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![CustomTkinter](https://img.shields.io/badge/GUI-CustomTkinter-1F538D?style=flat-square)](https://github.com/TomSchimansky/CustomTkinter)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+[![Code Lines](https://img.shields.io/badge/Code-1543%20lines-blue?style=flat-square)]()
+[![Last Commit](https://img.shields.io/badge/Last%20Commit-2026--03--28-orange?style=flat-square)]()
+
 一个简单好用的 Minecraft Java版 存档管理工具。
 
 ![主界面截图](./img/screenshot.png)
