@@ -100,13 +100,7 @@
 └── README.md       # 说明文档
 ```
 
----
-
-## � 开发环境
-
-- **Python**: 3.10+
-- **GUI 框架**: CustomTkinter
-- **图像处理**: Pillow
+> 💡 开发环境详情查看 [Wiki - 开发文档](https://github.com/TuxLin123233/Minecraft-Save-Manager/wiki/开发文档)
 
 ---
 
