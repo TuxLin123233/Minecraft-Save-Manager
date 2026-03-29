@@ -49,26 +49,26 @@ class PathConfig:
         """
         self.frozen: bool = getattr(sys, "frozen", False)
         if self.frozen:
-            self.temp_resource = Path(sys._MEIPASS)     # type:ignore
+            self.temp_resource: Path = Path(sys._MEIPASS)     # type:ignore
 
-        self.BASE_PATH = self.get_base_path()
+        self.BASE_PATH: Path = self.get_base_path()
         
-        self.TEMP_PATH = self.BASE_PATH / "temp"
-        self.DATA_PATH = self.BASE_PATH / "data.json"
-        self.FONTS_PATH = self.BASE_PATH / "fonts"
+        self.TEMP_PATH: Path = self.BASE_PATH / "temp"
+        self.DATA_PATH: Path = self.BASE_PATH / "data.json"
+        self.FONTS_PATH: Path = self.BASE_PATH / "fonts"
 
-        self.FONT_REGULAR_FILENAME = "HarmonyOS_Sans_SC_Regular.ttf"
-        self.FONT_MEDIUM_FILENAME = "HarmonyOS_Sans_SC_Medium.ttf"
-        self.FONT_REGULAR_NAME = "HarmonyOS Sans SC"
-        self.FONT_MEDIUM_NAME = "HarmonyOS Sans SC Medium"
-        self.FONT_REGULAR_PATH = self.get_font_path(self.FONT_REGULAR_FILENAME)
-        self.FONT_MEDIUM_PATH = self.get_font_path(self.FONT_MEDIUM_FILENAME)
+        self.FONT_REGULAR_FILENAME: str = "HarmonyOS_Sans_SC_Regular.ttf"
+        self.FONT_MEDIUM_FILENAME: str = "HarmonyOS_Sans_SC_Medium.ttf"
+        self.FONT_REGULAR_NAME: str = "HarmonyOS Sans SC"
+        self.FONT_MEDIUM_NAME: str = "HarmonyOS Sans SC Medium"
+        self.FONT_REGULAR_PATH: Path = self.get_font_path(self.FONT_REGULAR_FILENAME)
+        self.FONT_MEDIUM_PATH: Path = self.get_font_path(self.FONT_MEDIUM_FILENAME)
         
-        self.SOUND_PATH = self.BASE_PATH / "sounds"
+        self.SOUND_PATH: Path = self.BASE_PATH / "sounds"
 
     def get_base_path(self) -> Path:
         """获取基础路径，支持开发环境和打包环境
-        
+
         逻辑流程:
             判断是否为打包环境
             ├─ 打包环境: 返回可执行文件所在目录
@@ -84,7 +84,7 @@ class PathConfig:
 
     def get_font_path(self, font_name: str) -> Path:
         """获取字体文件完整路径
-        
+
         逻辑流程:
             判断是否为打包环境
             ├─ 打包环境: 返回临时资源目录下的字体文件路径
@@ -101,9 +101,9 @@ class PathConfig:
         else:
             return self.FONTS_PATH / font_name
 
-    def get_sound_path(self, sound_name:str) -> Path:
+    def get_sound_path(self, sound_name: str) -> Path:
         """获取音频文件完整路径
-        
+
         逻辑流程:
             判断是否为打包环境
             ├─ 打包环境: 返回临时资源目录下的音频文件路径
@@ -119,9 +119,7 @@ class PathConfig:
         else:
             return self.SOUND_PATH / sound_name
 
+
 path_config = PathConfig()
 
-data_defalut = {
-    "minecraft_path": "",
-    "migrate": False
-}
+data_defalut = {"minecraft_path": "", "migrate": False}

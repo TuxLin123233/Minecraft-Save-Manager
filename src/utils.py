@@ -3,7 +3,7 @@ from config import *
 
 def zip_extract(zip_path: str, extract_path: str, name: str) -> None:
     """解压ZIP存档到指定目录
-    
+
     逻辑流程:
         检查临时目录是否存在，不存在则创建
         ↓
@@ -26,7 +26,7 @@ def zip_extract(zip_path: str, extract_path: str, name: str) -> None:
 
     Returns:
         None
-        
+
     Raises:
         zipfile.BadZipFile: 如果文件不是有效的ZIP文件
         ValueError: 如果ZIP文件中没有可提取的内容
@@ -49,9 +49,9 @@ def zip_extract(zip_path: str, extract_path: str, name: str) -> None:
     shutil.move(origin_path, Path(extract_path) / name)
 
 
-def get_image(image_name: str, size: tuple) -> ctk.CTkImage:
+def get_image(image_name: str, size: tuple[int, int]) -> ctk.CTkImage:
     """获取CTkImage图像对象（支持缩放）
-    
+
     逻辑流程:
         检查是否在PyInstaller打包环境中运行
         ├─ 打包环境
@@ -73,9 +73,9 @@ def get_image(image_name: str, size: tuple) -> ctk.CTkImage:
         ctk.CTkImage: 可缩放图像对象
     """
     import sys
-    
+
     if getattr(sys, "frozen", False):
-        base_path = sys._MEIPASS    # type:ignore
+        base_path = sys._MEIPASS  # type: ignore
         # 优先从icon文件夹查找，找不到再从img文件夹查找
         img_path = Path(base_path, "icon", f"{image_name}.png")
         if not img_path.exists():
@@ -87,19 +87,15 @@ def get_image(image_name: str, size: tuple) -> ctk.CTkImage:
         img_path = project_root / "icon" / f"{image_name}.png"
         if not img_path.exists():
             img_path = project_root / "img" / f"{image_name}.png"
-    
+
     pil_image = Image.open(img_path)
-    
-    return ctk.CTkImage(
-        light_image=pil_image,
-        dark_image=pil_image,
-        size=size
-    )
+
+    return ctk.CTkImage(light_image=pil_image, dark_image=pil_image, size=size)
 
 
 def folder_dialog(title: str) -> str:
     """调用文件管理器选择文件夹路径
-    
+
     逻辑流程:
         打开文件夹选择对话框
         ↓
@@ -122,7 +118,7 @@ def folder_dialog(title: str) -> str:
 
 def write_data(data: dict) -> None:
     """写入数据到配置文件
-    
+
     逻辑流程:
         打开数据文件 (data.json)
         ↓
@@ -142,7 +138,7 @@ def write_data(data: dict) -> None:
 
 def read_data() -> dict:
     """从配置文件读取数据
-    
+
     逻辑流程:
         检查数据文件是否存在
         ├─ 不存在: 返回默认配置
@@ -164,11 +160,11 @@ def read_data() -> dict:
         return data_defalut
     with open(path_config.DATA_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
-    
 
-def center_window(window:ctk.CTk|ctk.CTkToplevel):
+
+def center_window(window: ctk.CTk | ctk.CTkToplevel) -> None:
     """让窗口居中显示
-    
+
     逻辑流程:
         更新窗口任务以确保尺寸已计算
         ↓
@@ -187,22 +183,24 @@ def center_window(window:ctk.CTk|ctk.CTkToplevel):
         None
     """
     window.update_idletasks()
-        
+
     screen_width = window.winfo_screenwidth()
     screen_height = window.winfo_screenheight()
-    
+
     win_width = window.winfo_width()
     win_height = window.winfo_height()
-    
+
     x = (screen_width - win_width) // 2
     y = (screen_height - win_height) // 2
-    
-    window.geometry(f"+{x}+{y}")
-        
 
-def auto_label_window_width(label:ctk.CTkLabel, window:ctk.CTk|ctk.CTkToplevel, window_height:int) -> None:
+    window.geometry(f"+{x}+{y}")
+
+
+def auto_label_window_width(
+    label: ctk.CTkLabel, window: ctk.CTk | ctk.CTkToplevel, window_height: int
+) -> None:
     """自动根据Label文字宽度设置窗口宽度
-    
+
     逻辑流程:
         更新窗口任务以渲染Label
         ↓
@@ -221,14 +219,14 @@ def auto_label_window_width(label:ctk.CTkLabel, window:ctk.CTk|ctk.CTkToplevel, 
         None
     """
     window.update_idletasks()
-    
+
     text_width = label.winfo_reqwidth()
-    window.geometry(f"{text_width + 40}x{window_height}")    
+    window.geometry(f"{text_width + 40}x{window_height}")
 
 
-def is_minecraft_folder(minecraft_path) -> dict:
+def is_minecraft_folder(minecraft_path: str) -> dict:
     """判断是否为minecraft路径
-    
+
     逻辑流程:
         初始化结果字典 {find: False, migrate: False}
         ↓
@@ -250,25 +248,23 @@ def is_minecraft_folder(minecraft_path) -> dict:
             - find (bool): 是否为有效的.minecraft文件夹
             - migrate (bool): 是否为版本迁移结构（存档在versions目录下）
     """
-    result:dict = {
-        "find": False,
-        "migrate": False
-    }
-    
+    result: dict = {"find": False, "migrate": False}
+
     if not Path(minecraft_path, "launcher_profiles.json").exists():
         return result
-    
+
     if Path(minecraft_path, "saves").exists():
         result["find"] = True
     elif Path(minecraft_path, "versions").exists():
         result["find"] = True
         result["migrate"] = True
-        
+
     return result
 
-def get_saves_data() -> dict|list|None:
+
+def get_saves_data() -> dict | list | None:
     """获取存档列表
-    
+
     逻辑流程:
         读取配置文件 → read_data()
         ↓
@@ -284,36 +280,37 @@ def get_saves_data() -> dict|list|None:
         返回存档数据
 
     Returns:
-        dict|list|None: 
+        dict|list|None:
             - 版本迁移结构: 返回字典 {版本名: [存档列表]}
             - 标准结构: 返回列表 [存档列表]
             - 无配置: 返回 None
     """
     data = read_data()  # 获取配置文件
-    minecraft_path = data['minecraft_path'] 
-    
+    minecraft_path = data["minecraft_path"]
+
     result = []
-    
-    if minecraft_path and data['migrate']:     # 为版本迁移
+
+    if minecraft_path and data["migrate"]:  # 为版本迁移
         result = {}
-        version_list = list(Path(minecraft_path, 'versions').glob('*'))
+        version_list = list(Path(minecraft_path, "versions").glob("*"))
         for version in version_list:
             result[version.name] = []
-            saves_list = list(Path(version, 'saves').glob('*'))
+            saves_list = list(Path(version, "saves").glob("*"))
             for save in saves_list:
                 result[version.name].append(save.name)
-    elif minecraft_path and data['migrate']:
+    elif minecraft_path and data["migrate"]:
         saves_list = list(Path(minecraft_path).glob("*"))
         for save in saves_list:
             result.append(save.name)
     elif not minecraft_path:
         return None
-        
+
     return result
 
-def limit_name_length(name:str, max_length:int=20) -> str:
+
+def limit_name_length(name: str, max_length: int = 20) -> str:
     """限制名称长度
-    
+
     逻辑流程:
         检查名称长度是否超过最大长度
         ├─ 超过: 截断名称到最大长度
@@ -328,5 +325,5 @@ def limit_name_length(name:str, max_length:int=20) -> str:
     """
     if len(name) > max_length:
         return name[:max_length] + "..."
-    
+
     return name
