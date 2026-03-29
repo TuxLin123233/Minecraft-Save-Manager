@@ -277,7 +277,7 @@ class App:
         saves_data: dict | list | None = get_saves_data()
         if saves_data is None:
             ask: bool = Message(self.window).yes_no(
-                "错误", "未检测到任何存档", self.font_text(14)
+                "错误", "未检测到任何存档，是否选择告诉我你的.minecraft文件夹?", self.font_text(14)
             )
             if ask:
                 data: dict | None = self._set_minecraftPath(data=read_data())
